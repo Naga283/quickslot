@@ -19,6 +19,12 @@ export const listBookingsSchema = z.object({
   }),
 });
 
+export const getUserBookingsSchema = z.object({
+  params: z.object({
+    id: z.string().uuid('Invalid user ID format'),
+  }),
+});
+
 export const createWaitlistSchema = z.object({
   body: z.object({
     userId: z.string().uuid('Invalid user ID format'),

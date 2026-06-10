@@ -46,6 +46,16 @@ export class BookingController {
       next(error);
     }
   }
+
+  async getBookingsForUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      const bookings = await bookingService.getBookings({ userId: id });
+      successResponse(res, bookings, 'User bookings retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const bookingController = new BookingController();
