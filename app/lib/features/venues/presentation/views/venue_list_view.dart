@@ -348,6 +348,8 @@ class VenueListView extends ConsumerWidget {
     bool isDark,
     Venue venue,
   ) {
+    final imageUrl = _venueImageUrl(venue);
+
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -374,9 +376,9 @@ class VenueListView extends ConsumerWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  if (venue.imageUrl != null && venue.imageUrl!.isNotEmpty)
+                  if (imageUrl.isNotEmpty)
                     Image.network(
-                      venue.imageUrl!,
+                      imageUrl,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) =>
                           _buildPlaceholderImage(theme),
@@ -472,5 +474,16 @@ class VenueListView extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  String _venueImageUrl(Venue venue) {
+    switch (venue.sportType.toLowerCase()) {
+      case 'football':
+        return 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?auto=format&fit=crop&w=900&q=80';
+      case 'cricket':
+        return 'https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&w=900&q=80';
+      default:
+        return venue.imageUrl ?? '';
+    }
   }
 }

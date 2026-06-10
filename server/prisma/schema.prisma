@@ -1,10 +1,11 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
-}
-generator client {
-  provider = "prisma-client-js"
 }
 
 model User {
@@ -16,7 +17,7 @@ model User {
 }
 
 model Venue {
-  id        String   @id @default(uuid())
+  id        String  @id @default(uuid())
   name      String
   sportType String
   address   String
@@ -26,20 +27,15 @@ model Venue {
   @@index([sportType])
 }
 
-enum SlotStatus {
-  AVAILABLE
-  BOOKED
-}
-
 model Slot {
   id        String     @id @default(uuid())
   venueId   String
-  venue     Venue      @relation(fields: [venueId], references: [id], onDelete: Cascade)
   date      DateTime   @db.Date
   startTime DateTime
   endTime   DateTime
   status    SlotStatus @default(AVAILABLE)
   booking   Booking?
+  venue     Venue      @relation(fields: [venueId], references: [id], onDelete: Cascade)
   waitlists Waitlist[]
 
   @@index([venueId, date])
@@ -49,10 +45,10 @@ model Slot {
 model Booking {
   id        String   @id @default(uuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   slotId    String   @unique
-  slot      Slot     @relation(fields: [slotId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+  slot      Slot     @relation(fields: [slotId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -60,12 +56,17 @@ model Booking {
 model Waitlist {
   id        String   @id @default(uuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   slotId    String
-  slot      Slot     @relation(fields: [slotId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+  slot      Slot     @relation(fields: [slotId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([slotId, userId])
   @@index([userId])
   @@index([slotId, createdAt])
+}
+
+enum SlotStatus {
+  AVAILABLE
+  BOOKED
 }

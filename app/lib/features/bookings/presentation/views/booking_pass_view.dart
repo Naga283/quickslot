@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:share_plus/share_plus.dart';
+// import 'package:share_plus/share_plus.dart';
 
 class BookingPassView extends StatelessWidget {
   final String bookingId;
@@ -82,13 +82,13 @@ class BookingPassView extends StatelessWidget {
       final file = File('${tempDir.path}/quickslot_pass_$_shortBookingId.png');
       await file.writeAsBytes(pngBytes);
 
-      await SharePlus.instance.share(
-        ShareParams(
-          files: [XFile(file.path)],
-          text:
-              'My QuickSlot Booking Pass – $venueName on $_formattedDate at $_formattedTime',
-        ),
-      );
+      // await SharePlus.instance.share(
+      //   ShareParams(
+      //     files: [XFile(file.path)],
+      //     text:
+      //         'My QuickSlot Booking Pass – $venueName on $_formattedDate at $_formattedTime',
+      //   ),
+      // );
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

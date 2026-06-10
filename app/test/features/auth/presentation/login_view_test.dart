@@ -32,16 +32,25 @@ class _FakeAuthRepository implements AuthRepository {
 }
 
 void main() {
-  setUp(() async {
-    Hive.init('${Directory.systemTemp.path}/quickslot_login_widget_test');
+  late Directory tempDir;
+
+  setUpAll(() async {
+    tempDir = Directory.systemTemp.createTempSync(
+      'quickslot_login_widget_test_',
+    );
+    Hive.init(tempDir.path);
     await Hive.openBox('auth_cache');
     await Hive.openBox('bookings_cache');
+  });
+
+  setUp(() async {
     await Hive.box('auth_cache').clear();
     await Hive.box('bookings_cache').clear();
   });
 
-  tearDown(() async {
+  tearDownAll(() async {
     await Hive.close();
+    tempDir.deleteSync(recursive: true);
   });
 
   testWidgets(

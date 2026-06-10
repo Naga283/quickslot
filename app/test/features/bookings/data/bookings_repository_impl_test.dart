@@ -30,6 +30,7 @@ class _FakeAdapter implements HttpClientAdapter {
 void main() {
   late Dio dio;
   late Box box;
+  late Directory tempDir;
 
   const userId = '11111111-1111-4111-8111-111111111111';
   const slotId = '22222222-2222-4222-8222-222222222222';
@@ -41,16 +42,23 @@ void main() {
     'createdAt': '2026-06-11T08:00:00.000Z',
   };
 
-  setUp(() async {
-    Hive.init('${Directory.systemTemp.path}/quickslot_booking_repo_test');
+  setUpAll(() async {
+    tempDir = Directory.systemTemp.createTempSync(
+      'quickslot_booking_repo_test_',
+    );
+    Hive.init(tempDir.path);
     box = await Hive.openBox('bookings_cache');
+  });
+
+  setUp(() async {
     await box.clear();
     dio = Dio(BaseOptions(baseUrl: 'http://localhost:4000/api'));
   });
 
-  tearDown(() async {
+  tearDownAll(() async {
     await box.clear();
     await box.close();
+    tempDir.deleteSync(recursive: true);
   });
 
   test('createBooking posts ids and parses booking response', () async {

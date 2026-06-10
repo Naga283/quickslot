@@ -59,7 +59,7 @@ async function main() {
         name: 'Apex Football Turf',
         sportType: 'Football',
         address: '456 Stadium Rd, Green Field',
-        imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500',
+        imageUrl: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?auto=format&fit=crop&w=900&q=80',
       },
     }),
     prisma.venue.create({
@@ -67,7 +67,7 @@ async function main() {
         name: 'Strikers Cricket Nets',
         sportType: 'Cricket',
         address: '789 Willow Ln, Cricket Ground',
-        imageUrl: 'https://images.unsplash.com/photo-1531415080290-b9b69999c757?w=500',
+        imageUrl: 'https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&w=900&q=80',
       },
     }),
     prisma.venue.create({

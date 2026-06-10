@@ -3,7 +3,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz_init;
-import 'package:flutter_timezone/flutter_timezone.dart';
+// import 'package:flutter_timezone/flutter_timezone.dart';
 
 part 'notification_service.g.dart';
 
@@ -18,16 +18,18 @@ class NotificationService extends _$NotificationService {
 
   Future<void> init() async {
     tz_init.initializeTimeZones();
-    try {
-      final tzInfo = await FlutterTimezone.getLocalTimezone();
-      final String timeZoneName = tzInfo.identifier;
-      tz.setLocalLocation(tz.getLocation(timeZoneName));
-      log('[Notification] Set local timezone to $timeZoneName');
-    } catch (e) {
-      log('[Notification] Failed to set local location, defaulting to UTC: $e');
-    }
-    
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    // try {
+    //   final tzInfo = await FlutterTimezone.getLocalTimezone();
+    //   final String timeZoneName = tzInfo.identifier;
+    //   tz.setLocalLocation(tz.getLocation(timeZoneName));
+    //   log('[Notification] Set local timezone to $timeZoneName');
+    // } catch (e) {
+    //   log('[Notification] Failed to set local location, defaulting to UTC: $e');
+    // }
+
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
@@ -47,8 +49,10 @@ class NotificationService extends _$NotificationService {
     );
 
     // Request Android 13+ permission specifically
-    final androidPlugin = _localNotificationsPlugin.resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>();
+    final androidPlugin = _localNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
     if (androidPlugin != null) {
       await androidPlugin.requestNotificationsPermission();
     }
@@ -116,7 +120,8 @@ class NotificationService extends _$NotificationService {
       tzDateTime,
       details,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
       payload: payload,
     );
   }

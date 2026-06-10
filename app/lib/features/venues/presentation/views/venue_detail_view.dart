@@ -105,6 +105,8 @@ class VenueDetailView extends ConsumerWidget {
             ),
           ),
           data: (venue) {
+            final imageUrl = _venueImageUrl(venue);
+
             return NestedScrollView(
               headerSliverBuilder: (context, innerBoxIsScrolled) => [
                 // Custom App Bar with image overlay
@@ -130,9 +132,23 @@ class VenueDetailView extends ConsumerWidget {
                     background: Stack(
                       fit: StackFit.expand,
                       children: [
-                        if (venue.imageUrl != null &&
-                            venue.imageUrl!.isNotEmpty)
-                          Image.network(venue.imageUrl!, fit: BoxFit.cover)
+                        if (imageUrl.isNotEmpty)
+                          Image.network(
+                            imageUrl,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                Container(
+                                  color: theme.colorScheme.primary.withOpacity(
+                                    0.1,
+                                  ),
+                                  child: const Center(
+                                    child: Icon(
+                                      Icons.image_not_supported_rounded,
+                                      size: 56,
+                                    ),
+                                  ),
+                                ),
+                          )
                         else
                           Container(
                             color: theme.colorScheme.primary.withOpacity(0.1),
@@ -597,6 +613,17 @@ class VenueDetailView extends ConsumerWidget {
         return 'Sun';
       default:
         return '';
+    }
+  }
+
+  String _venueImageUrl(Venue venue) {
+    switch (venue.sportType.toLowerCase()) {
+      case 'football':
+        return 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?auto=format&fit=crop&w=1200&q=85';
+      case 'cricket':
+        return 'https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&w=1200&q=85';
+      default:
+        return venue.imageUrl ?? '';
     }
   }
 

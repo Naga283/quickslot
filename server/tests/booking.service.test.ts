@@ -110,7 +110,7 @@ describe('BookingService.createBooking', () => {
   });
 
   it('allows only one concurrent booking for the same slot', async () => {
-    let lockedStatus = SlotStatus.AVAILABLE;
+    let lockedStatus: SlotStatus = SlotStatus.AVAILABLE;
     let createdCount = 0;
     const tx = {
       $queryRaw: jest.fn(async () => [{ ...slot, status: lockedStatus }]),
@@ -126,7 +126,12 @@ describe('BookingService.createBooking', () => {
       },
     };
 
-    mockedPrisma.$transaction.mockImplementation((callback) => callback(tx));
+    let transactionQueue = Promise.resolve();
+    mockedPrisma.$transaction.mockImplementation((callback) => {
+      const run = transactionQueue.then(() => callback(tx));
+      transactionQueue = run.catch(() => undefined);
+      return run;
+    });
     (bookingRepository.create as jest.Mock).mockImplementation(async () => {
       createdCount += 1;
       return {
@@ -143,7 +148,9 @@ describe('BookingService.createBooking', () => {
     ]);
 
     expect(results.filter((result) => result.status === 'fulfilled')).toHaveLength(1);
-    const rejected = results.find((result) => result.status === 'rejected') as PromiseRejectedResult;
+    const rejected = results.find(
+      (result) => result.status === 'rejected',
+    ) as PromiseRejectedResult;
     expect(rejected.reason).toBeInstanceOf(ApiError);
     expect(rejected.reason.statusCode).toBe(409);
     expect(bookingRepository.create).toHaveBeenCalledTimes(1);
