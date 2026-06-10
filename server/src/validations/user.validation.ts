@@ -7,6 +7,13 @@ export const createUserSchema = z.object({
   }),
 });
 
+export const loginUserSchema = z.object({
+  body: z.object({
+    username: z.string().min(1, 'Username is required'),
+    password: z.string().min(1, 'Password is required'),
+  }),
+});
+
 export const getUserSchema = z.object({
   params: z.object({
     id: z.string().uuid('Invalid user ID format'),

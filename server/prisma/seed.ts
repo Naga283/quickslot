@@ -2,6 +2,34 @@ import { PrismaClient, SlotStatus } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+const demoUsers = [
+  {
+    id: '11111111-1111-4111-8111-111111111111',
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+  },
+  {
+    id: '22222222-2222-4222-8222-222222222222',
+    name: 'Jane Smith',
+    email: 'jane.smith@example.com',
+  },
+  {
+    id: '33333333-3333-4333-8333-333333333333',
+    name: 'Mike Johnson',
+    email: 'mike.johnson@example.com',
+  },
+  {
+    id: '44444444-4444-4444-8444-444444444444',
+    name: 'Emily Davis',
+    email: 'emily.davis@example.com',
+  },
+  {
+    id: '55555555-5555-4555-8555-555555555555',
+    name: 'David Wilson',
+    email: 'david.wilson@example.com',
+  },
+];
+
 async function main() {
   console.log('Clearing database...');
   await prisma.booking.deleteMany();
@@ -11,13 +39,9 @@ async function main() {
   await prisma.user.deleteMany();
 
   console.log('Seeding users...');
-  const users = await Promise.all([
-    prisma.user.create({ data: { name: 'John Doe', email: 'john.doe@example.com' } }),
-    prisma.user.create({ data: { name: 'Jane Smith', email: 'jane.smith@example.com' } }),
-    prisma.user.create({ data: { name: 'Mike Johnson', email: 'mike.johnson@example.com' } }),
-    prisma.user.create({ data: { name: 'Emily Davis', email: 'emily.davis@example.com' } }),
-    prisma.user.create({ data: { name: 'David Wilson', email: 'david.wilson@example.com' } }),
-  ]);
+  const users = await Promise.all(
+    demoUsers.map((user) => prisma.user.create({ data: user })),
+  );
   console.log(`Created ${users.length} users.`);
 
   console.log('Seeding venues...');

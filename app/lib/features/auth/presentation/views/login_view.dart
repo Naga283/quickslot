@@ -1,31 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../domain/models/user.dart';
 import '../providers/auth_providers.dart';
 
-class LoginView extends ConsumerWidget {
+class LoginView extends ConsumerStatefulWidget {
   const LoginView({super.key});
 
-  static const List<User> mockUsers = [
-    User(
-      id: 'john-doe-id',
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-    ),
-    User(
-      id: 'jane-smith-id',
-      name: 'Jane Smith',
-      email: 'jane.smith@example.com',
-    ),
-    User(
-      id: 'mike-johnson-id',
-      name: 'Mike Johnson',
-      email: 'mike.johnson@example.com',
-    ),
-  ];
+  @override
+  ConsumerState<LoginView> createState() => _LoginViewState();
+}
+
+class _LoginViewState extends ConsumerState<LoginView> {
+  final _formKey = GlobalKey<FormState>();
+  final _usernameController = TextEditingController(
+    text: 'john.doe@example.com',
+  );
+  final _passwordController = TextEditingController();
+  bool _isLoading = false;
+  bool _obscurePassword = true;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _login() async {
+    if (!_formKey.currentState!.validate() || _isLoading) return;
+
+    setState(() => _isLoading = true);
+    try {
+      final user = await ref
+          .read(authRepositoryProvider)
+          .login(
+            username: _usernameController.text.trim(),
+            password: _passwordController.text,
+          );
+      await ref.read(currentUserProvider.notifier).setUser(user);
+    } catch (err) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(err.toString().replaceFirst('Exception: ', ''))),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -33,7 +58,10 @@ class LoginView extends ConsumerWidget {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 32.0,
+            ),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 400),
               child: Column(
@@ -60,7 +88,7 @@ class LoginView extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  
+
                   // App Title
                   Text(
                     'QuickSlot',
@@ -73,95 +101,90 @@ class LoginView extends ConsumerWidget {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
-                  
-                  // Subtitle
                   Text(
-                    'Select a profile below to start booking sports courts instantly',
+                    'Login to book sports courts instantly',
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      color: isDark
+                          ? const Color(0xFF94A3B8)
+                          : const Color(0xFF64748B),
                     ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 40),
-                  
-                  // User Cards
-                  ...mockUsers.map((user) {
-                    final initials = user.name.split(' ').map((e) => e[0]).join('');
-                    
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0),
-                      child: Card(
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          side: BorderSide(
-                            color: isDark
-                                ? const Color(0xFF334155).withOpacity(0.5) // Slate 700
-                                : const Color(0xFFE2E8F0), // Slate 200
-                            width: 1,
+
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        TextFormField(
+                          controller: _usernameController,
+                          keyboardType: TextInputType.emailAddress,
+                          textInputAction: TextInputAction.next,
+                          decoration: const InputDecoration(
+                            labelText: 'Username',
+                            hintText: 'john.doe@example.com',
+                            prefixIcon: Icon(Icons.person_outline_rounded),
                           ),
-                        ),
-                        color: isDark ? const Color(0xFF1E293B) : Colors.white, // Slate 800
-                        clipBehavior: Clip.antiAlias,
-                        child: InkWell(
-                          onTap: () {
-                            ref.read(currentUserProvider.notifier).setUser(user);
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Username is required';
+                            }
+                            return null;
                           },
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-                            child: Row(
-                              children: [
-                                // Avatar circle
-                                CircleAvatar(
-                                  radius: 24,
-                                  backgroundColor: theme.colorScheme.primary.withOpacity(0.15),
-                                  child: Text(
-                                    initials,
-                                    style: TextStyle(
-                                      color: theme.colorScheme.primary,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                
-                                // User info
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        user.name,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        user.email,
-                                        style: TextStyle(
-                                          color: isDark ? const Color(0xFF64748B) : const Color(0xFF64748B),
-                                          fontSize: 13,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                
-                                // Arrow icon
-                                Icon(
-                                  Icons.chevron_right_rounded,
-                                  color: theme.colorScheme.primary.withOpacity(0.7),
-                                ),
-                              ],
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _passwordController,
+                          obscureText: _obscurePassword,
+                          textInputAction: TextInputAction.done,
+                          onFieldSubmitted: (_) => _login(),
+                          decoration: InputDecoration(
+                            labelText: 'Password',
+                            prefixIcon: const Icon(Icons.lock_outline_rounded),
+                            suffixIcon: IconButton(
+                              tooltip: _obscurePassword
+                                  ? 'Show password'
+                                  : 'Hide password',
+                              onPressed: () {
+                                setState(
+                                  () => _obscurePassword = !_obscurePassword,
+                                );
+                              },
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
+                              ),
                             ),
                           ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Password is required';
+                            }
+                            return null;
+                          },
                         ),
-                      ),
-                    );
-                  }),
+                        const SizedBox(height: 24),
+                        FilledButton.icon(
+                          onPressed: _isLoading ? null : _login,
+                          icon: _isLoading
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.login_rounded),
+                          label: Text(_isLoading ? 'Logging in...' : 'Login'),
+                          style: FilledButton.styleFrom(
+                            minimumSize: const Size.fromHeight(52),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),

@@ -1,26 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'socket_service.dart';
+part of 'notification_service.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$socketServiceHash() => r'c793babd765c83c0347b7fe3a157777311dda5f0';
+String _$notificationServiceHash() =>
+    r'c67e1c47b21db61cacffbf482f0635ef7e4b3358';
 
-/// See also [SocketService].
-@ProviderFor(SocketService)
-final socketServiceProvider =
-    AutoDisposeNotifierProvider<SocketService, WaitlistPromotion?>.internal(
-  SocketService.new,
-  name: r'socketServiceProvider',
+/// See also [NotificationService].
+@ProviderFor(NotificationService)
+final notificationServiceProvider =
+    AutoDisposeNotifierProvider<NotificationService, void>.internal(
+  NotificationService.new,
+  name: r'notificationServiceProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$socketServiceHash,
+      : _$notificationServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$SocketService = AutoDisposeNotifier<WaitlistPromotion?>;
+typedef _$NotificationService = AutoDisposeNotifier<void>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

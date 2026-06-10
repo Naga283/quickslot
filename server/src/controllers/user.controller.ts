@@ -12,6 +12,15 @@ export class UserController {
     }
   }
 
+  async login(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const user = await userService.login(req.body.username, req.body.password);
+      successResponse(res, user, 'Login successful');
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getUserById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const user = await userService.getUserById(req.params.id);

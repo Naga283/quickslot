@@ -21,7 +21,7 @@ final venuesRepositoryProvider = AutoDisposeProvider<VenuesRepository>.internal(
 );
 
 typedef VenuesRepositoryRef = AutoDisposeProviderRef<VenuesRepository>;
-String _$fetchVenuesHash() => r'733a545ed27eb349fabe72efe76a8b0d421ab920';
+String _$fetchVenuesHash() => r'8dc4a099945f313b8244058ccf3af43cd0a65fb6';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -95,7 +95,7 @@ class FetchVenuesFamily
 
 /// See also [fetchVenues].
 class FetchVenuesProvider
-    extends AutoDisposeFutureProvider<(List<Venue> venues, int totalCount)> {
+    extends FutureProvider<(List<Venue> venues, int totalCount)> {
   /// See also [fetchVenues].
   FetchVenuesProvider({
     String? sportType,
@@ -161,8 +161,7 @@ class FetchVenuesProvider
   }
 
   @override
-  AutoDisposeFutureProviderElement<(List<Venue> venues, int totalCount)>
-      createElement() {
+  FutureProviderElement<(List<Venue> venues, int totalCount)> createElement() {
     return _FetchVenuesProviderElement(this);
   }
 
@@ -186,7 +185,7 @@ class FetchVenuesProvider
 }
 
 mixin FetchVenuesRef
-    on AutoDisposeFutureProviderRef<(List<Venue> venues, int totalCount)> {
+    on FutureProviderRef<(List<Venue> venues, int totalCount)> {
   /// The parameter `sportType` of this provider.
   String? get sportType;
 
@@ -197,8 +196,9 @@ mixin FetchVenuesRef
   int get limit;
 }
 
-class _FetchVenuesProviderElement extends AutoDisposeFutureProviderElement<
-    (List<Venue> venues, int totalCount)> with FetchVenuesRef {
+class _FetchVenuesProviderElement
+    extends FutureProviderElement<(List<Venue> venues, int totalCount)>
+    with FetchVenuesRef {
   _FetchVenuesProviderElement(super.provider);
 
   @override

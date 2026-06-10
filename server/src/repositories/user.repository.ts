@@ -17,6 +17,14 @@ export class UserRepository {
       where: { email },
     });
   }
+
+  async findByEmailOrName(username: string): Promise<User | null> {
+    return prisma.user.findFirst({
+      where: {
+        OR: [{ email: username }, { name: username }],
+      },
+    });
+  }
 }
 
 export const userRepository = new UserRepository();

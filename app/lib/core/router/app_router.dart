@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../features/venues/presentation/views/venue_list_view.dart';
 import '../../features/venues/presentation/views/venue_detail_view.dart';
 import '../../features/bookings/presentation/views/my_bookings_view.dart';
+import '../../features/bookings/presentation/views/booking_pass_view.dart';
 import '../../features/auth/presentation/views/login_view.dart';
 import '../../features/auth/presentation/providers/auth_providers.dart';
 
@@ -38,6 +39,22 @@ GoRouter goRouter(GoRouterRef ref) {
         path: '/login',
         name: 'login',
         builder: (context, state) => const LoginView(),
+      ),
+      GoRoute(
+        path: '/booking-pass',
+        name: 'booking-pass',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return BookingPassView(
+            bookingId: extra['bookingId'] as String,
+            venueName: extra['venueName'] as String,
+            sportType: extra['sportType'] as String,
+            address: extra['address'] as String,
+            date: extra['date'] as DateTime,
+            startTime: extra['startTime'] as DateTime,
+            endTime: extra['endTime'] as DateTime,
+          );
+        },
       ),
     ],
     redirect: (context, state) {

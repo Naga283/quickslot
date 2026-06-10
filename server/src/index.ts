@@ -15,9 +15,9 @@ const server = http.createServer(app);
 // Initialize Socket.io server
 initSocket(server);
 
-server.listen(PORT, () => {
-  logger.info(`🚀 QuickSlot server successfully started at http://localhost:${PORT}`);
-  logger.info(`📖 API Documentation available at http://localhost:${PORT}/api-docs`);
+server.listen(Number(PORT), '0.0.0.0', () => {
+  logger.info(`🚀 QuickSlot server successfully started at http://0.0.0.0:${PORT}`);
+  logger.info(`📖 API Documentation available at http://0.0.0.0:${PORT}/api-docs`);
 });
 
 // Handle graceful shutdown

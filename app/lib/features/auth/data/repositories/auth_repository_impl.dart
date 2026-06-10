@@ -22,6 +22,23 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<User> login({
+    required String username,
+    required String password,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/users/login',
+        data: {'username': username, 'password': password},
+      );
+      final data = response.data['data'] as Map<String, dynamic>;
+      return User.fromJson(data);
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Failed to login');
+    }
+  }
+
+  @override
   Future<User> getUserById(String id) async {
     try {
       final response = await _dio.get('/users/$id');

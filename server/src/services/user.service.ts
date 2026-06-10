@@ -6,9 +6,17 @@ export class UserService {
   async createUser(data: Prisma.UserCreateInput): Promise<User> {
     const existing = await userRepository.findByEmail(data.email);
     if (existing) {
-      throw ApiError.conflict('Email is already registered');
+      return existing;
     }
     return userRepository.create(data);
+  }
+
+  async login(username: string, _password: string): Promise<User> {
+    const user = await userRepository.findByEmailOrName(username);
+    if (!user) {
+      throw ApiError.unauthorized('Invalid username or password');
+    }
+    return user;
   }
 
   async getUserById(id: string): Promise<User> {

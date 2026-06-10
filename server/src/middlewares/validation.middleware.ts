@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AnyZodObject, ZodError } from 'zod';
 import { ApiError } from '../utils/api-error';
+import { logger } from '../utils/logger';
 
 export const validate = (schema: AnyZodObject) => {
   return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
@@ -21,6 +22,7 @@ export const validate = (schema: AnyZodObject) => {
           field: err.path.slice(1).join('.'), // Remove 'body'/'query'/'params' prefix
           message: err.message,
         }));
+        logger.warn(`Validation failed for ${req.method} ${req.originalUrl}`, formattedErrors);
         next(ApiError.badRequest('Validation failed', formattedErrors));
       } else {
         next(error);

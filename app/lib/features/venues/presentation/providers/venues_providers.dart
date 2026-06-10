@@ -13,18 +13,16 @@ VenuesRepository venuesRepository(VenuesRepositoryRef ref) {
   return VenuesRepositoryImpl(dioClient);
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 Future<(List<Venue> venues, int totalCount)> fetchVenues(
   FetchVenuesRef ref, {
   String? sportType,
   int page = 1,
   int limit = 10,
 }) {
-  return ref.watch(venuesRepositoryProvider).getVenues(
-        sportType: sportType,
-        page: page,
-        limit: limit,
-      );
+  return ref
+      .watch(venuesRepositoryProvider)
+      .getVenues(sportType: sportType, page: page, limit: limit);
 }
 
 @riverpod
@@ -33,10 +31,9 @@ Future<List<Slot>> fetchVenueSlots(
   required String venueId,
   String? date,
 }) {
-  return ref.watch(venuesRepositoryProvider).getVenueSlots(
-        id: venueId,
-        date: date,
-      );
+  return ref
+      .watch(venuesRepositoryProvider)
+      .getVenueSlots(id: venueId, date: date);
 }
 
 @riverpod

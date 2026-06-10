@@ -5,6 +5,7 @@ import '../../../auth/presentation/providers/auth_providers.dart';
 import '../../../venues/presentation/providers/venues_providers.dart';
 import '../providers/bookings_providers.dart';
 import '../../domain/models/booking.dart';
+import '../../../../core/services/notification_service.dart';
 
 class MyBookingsView extends ConsumerStatefulWidget {
   const MyBookingsView({super.key});
@@ -79,6 +80,15 @@ class _MyBookingsViewState extends ConsumerState<MyBookingsView> {
 
     try {
       await ref.read(myBookingsProvider.notifier).cancel(booking.id);
+      
+      if (booking.slot != null) {
+        try {
+          await ref.read(notificationServiceProvider.notifier).cancelNotification(booking.slot!.id.hashCode + 1);
+        } catch (err) {
+          debugPrint('[Notification] Error cancelling reminder: $err');
+        }
+      }
+
       if (!context.mounted) return;
       Navigator.pop(context); // Pop loading indicator
       scaffoldMessenger.showSnackBar(
@@ -356,20 +366,53 @@ class _MyBookingsViewState extends ConsumerState<MyBookingsView> {
                           ],
                         ),
 
-                        // Cancel Button
+                        // Action Buttons
                         if (isUpcoming) ...[
                           const SizedBox(height: 16),
-                          OutlinedButton.icon(
-                            onPressed: () => _cancelBooking(context, booking),
-                            icon: const Icon(Icons.cancel_outlined, size: 18),
-                            label: const Text('Cancel Booking'),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: theme.colorScheme.error,
-                              side: BorderSide(color: theme.colorScheme.error.withOpacity(0.5)),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: OutlinedButton.icon(
+                                  onPressed: () {
+                                    if (slot != null) {
+                                      context.push('/booking-pass', extra: {
+                                        'bookingId': booking.id,
+                                        'venueName': venue?.name ?? 'Unknown Venue',
+                                        'sportType': venue?.sportType ?? 'Sport',
+                                        'address': venue?.address ?? 'Address Unavailable',
+                                        'date': slot.date,
+                                        'startTime': slot.startTime,
+                                        'endTime': slot.endTime,
+                                      });
+                                    }
+                                  },
+                                  icon: const Icon(Icons.qr_code_2_rounded, size: 18),
+                                  label: const Text('View Pass'),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: theme.colorScheme.primary,
+                                    side: BorderSide(color: theme.colorScheme.primary.withValues(alpha: 0.5)),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: OutlinedButton.icon(
+                                  onPressed: () => _cancelBooking(context, booking),
+                                  icon: const Icon(Icons.cancel_outlined, size: 18),
+                                  label: const Text('Cancel'),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: theme.colorScheme.error,
+                                    side: BorderSide(color: theme.colorScheme.error.withValues(alpha: 0.5)),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ],

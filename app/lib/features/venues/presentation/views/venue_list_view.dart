@@ -17,7 +17,7 @@ class VenueListView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+
     // Listen to Socket.IO notifications (e.g. waitlist promotions)
     ref.listen(socketServiceProvider, (previous, next) {
       if (next != null) {
@@ -40,20 +40,22 @@ class VenueListView extends ConsumerWidget {
         ref.read(socketServiceProvider.notifier).clearNotification();
       }
     });
-    
+
     // Watch Auth state
     final currentUser = ref.watch(currentUserProvider);
-    
+
     // Watch filter states
     final selectedSportType = ref.watch(selectedSportTypeProvider);
     final searchText = ref.watch(searchTexFilterProvider);
 
     // Watch query provider (fetching first page)
-    final venuesFuture = ref.watch(fetchVenuesProvider(
-      sportType: selectedSportType,
-      page: 1,
-      limit: 50, // Grab a large list to allow client-side search filtering
-    ));
+    final venuesFuture = ref.watch(
+      fetchVenuesProvider(
+        sportType: selectedSportType,
+        page: 1,
+        limit: 50, // Grab a large list to allow client-side search filtering
+      ),
+    );
 
     return Scaffold(
       body: SafeArea(
@@ -68,7 +70,10 @@ class VenueListView extends ConsumerWidget {
               elevation: 0,
               flexibleSpace: FlexibleSpaceBar(
                 background: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20.0,
+                    vertical: 12.0,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -94,7 +99,7 @@ class VenueListView extends ConsumerWidget {
                           ),
                         ],
                       ),
-                      
+
                       Row(
                         children: [
                           // My Bookings button
@@ -102,14 +107,19 @@ class VenueListView extends ConsumerWidget {
                             onPressed: () {
                               context.push('/bookings');
                             },
-                            icon: const Icon(Icons.calendar_today_rounded, size: 20),
+                            icon: const Icon(
+                              Icons.calendar_today_rounded,
+                              size: 20,
+                            ),
                             tooltip: 'My Bookings',
                           ),
                           const SizedBox(width: 8),
                           // Logout button
                           IconButton.filledTonal(
-                            onPressed: () {
-                              ref.read(currentUserProvider.notifier).logout();
+                            onPressed: () async {
+                              await ref
+                                  .read(currentUserProvider.notifier)
+                                  .logout();
                             },
                             icon: const Icon(Icons.logout_rounded, size: 20),
                             tooltip: 'Logout',
@@ -131,29 +141,37 @@ class VenueListView extends ConsumerWidget {
                 // Search Field & Category Chips
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                      vertical: 8.0,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         // Search bar
                         TextField(
                           onChanged: (val) {
-                            ref.read(searchTexFilterProvider.notifier).state = val;
+                            ref.read(searchTexFilterProvider.notifier).state =
+                                val;
                           },
                           decoration: InputDecoration(
                             hintText: 'Search venues by name...',
                             prefixIcon: const Icon(Icons.search_rounded),
                             filled: true,
-                            fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                            fillColor: isDark
+                                ? const Color(0xFF1E293B)
+                                : const Color(0xFFF1F5F9),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(16),
                               borderSide: BorderSide.none,
                             ),
-                            contentPadding: const EdgeInsets.symmetric(vertical: 14.0),
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 14.0,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 16),
-                        
+
                         // Sport Type Category Chips
                         SizedBox(
                           height: 40,
@@ -192,13 +210,11 @@ class VenueListView extends ConsumerWidget {
                     ),
                   ),
                 ),
-                
+
                 // Venues List Content
                 venuesFuture.when(
                   loading: () => const SliverFillRemaining(
-                    child: Center(
-                      child: CircularProgressIndicator(),
-                    ),
+                    child: Center(child: CircularProgressIndicator()),
                   ),
                   error: (err, stack) => SliverFillRemaining(
                     child: Padding(
@@ -206,11 +222,17 @@ class VenueListView extends ConsumerWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.error_outline_rounded, size: 48, color: theme.colorScheme.error),
+                          Icon(
+                            Icons.error_outline_rounded,
+                            size: 48,
+                            color: theme.colorScheme.error,
+                          ),
                           const SizedBox(height: 16),
                           Text(
                             'Failed to load venues',
-                            style: theme.textTheme.headlineMedium?.copyWith(fontSize: 18),
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              fontSize: 18,
+                            ),
                           ),
                           const SizedBox(height: 8),
                           Text(err.toString(), textAlign: TextAlign.center),
@@ -228,10 +250,12 @@ class VenueListView extends ConsumerWidget {
                   ),
                   data: (data) {
                     final allVenues = data.$1;
-                    
+
                     // Client side search filtering
                     final filteredVenues = allVenues.where((venue) {
-                      return venue.name.toLowerCase().contains(searchText.toLowerCase());
+                      return venue.name.toLowerCase().contains(
+                        searchText.toLowerCase(),
+                      );
                     }).toList();
 
                     if (filteredVenues.isEmpty) {
@@ -244,12 +268,16 @@ class VenueListView extends ConsumerWidget {
                               Icon(
                                 Icons.sports_tennis_rounded,
                                 size: 64,
-                                color: theme.colorScheme.primary.withOpacity(0.3),
+                                color: theme.colorScheme.primary.withOpacity(
+                                  0.3,
+                                ),
                               ),
                               const SizedBox(height: 16),
                               Text(
                                 'No venues found',
-                                style: theme.textTheme.headlineMedium?.copyWith(fontSize: 18),
+                                style: theme.textTheme.headlineMedium?.copyWith(
+                                  fontSize: 18,
+                                ),
                               ),
                               const SizedBox(height: 8),
                               const Text(
@@ -263,18 +291,23 @@ class VenueListView extends ConsumerWidget {
                     }
 
                     return SliverPadding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20.0,
+                        vertical: 8.0,
+                      ),
                       sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            final venue = filteredVenues[index];
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 16.0),
-                              child: _buildVenueCard(context, theme, isDark, venue),
-                            );
-                          },
-                          childCount: filteredVenues.length,
-                        ),
+                        delegate: SliverChildBuilderDelegate((context, index) {
+                          final venue = filteredVenues[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 16.0),
+                            child: _buildVenueCard(
+                              context,
+                              theme,
+                              isDark,
+                              venue,
+                            ),
+                          );
+                        }, childCount: filteredVenues.length),
                       ),
                     );
                   },
@@ -304,14 +337,17 @@ class VenueListView extends ConsumerWidget {
             ref.read(selectedSportTypeProvider.notifier).state = value;
           }
         },
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
 
-  Widget _buildVenueCard(BuildContext context, ThemeData theme, bool isDark, Venue venue) {
+  Widget _buildVenueCard(
+    BuildContext context,
+    ThemeData theme,
+    bool isDark,
+    Venue venue,
+  ) {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -342,7 +378,8 @@ class VenueListView extends ConsumerWidget {
                     Image.network(
                       venue.imageUrl!,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => _buildPlaceholderImage(theme),
+                      errorBuilder: (context, error, stackTrace) =>
+                          _buildPlaceholderImage(theme),
                       loadingBuilder: (context, child, loadingProgress) {
                         if (loadingProgress == null) return child;
                         return const Center(child: CircularProgressIndicator());
@@ -350,13 +387,16 @@ class VenueListView extends ConsumerWidget {
                     )
                   else
                     _buildPlaceholderImage(theme),
-                  
+
                   // Sport Type Tag Overlay
                   Positioned(
                     top: 12,
                     right: 12,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: theme.colorScheme.primary,
                         borderRadius: BorderRadius.circular(12),
@@ -374,7 +414,7 @@ class VenueListView extends ConsumerWidget {
                 ],
               ),
             ),
-            
+
             // Card Content
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -390,7 +430,7 @@ class VenueListView extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  
+
                   // Location details
                   Row(
                     children: [
