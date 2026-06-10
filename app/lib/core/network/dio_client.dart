@@ -13,7 +13,7 @@ Dio dio(DioRef ref) {
   final options = BaseOptions(
     baseUrl:
         const String.fromEnvironment('API_BASE_URL', defaultValue: '').isEmpty
-        ? 'http://$defaultHost:4000/api'
+        ? 'https://quickslot-bmgn.onrender.com/api'
         : const String.fromEnvironment('API_BASE_URL'),
     connectTimeout: const Duration(seconds: 10),
     receiveTimeout: const Duration(seconds: 10),
