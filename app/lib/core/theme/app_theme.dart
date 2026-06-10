@@ -28,12 +28,12 @@ class AppTheme {
           fontSize: 15,
         ),
       ),
-      cardTheme: CardTheme(
-        color: const Color(0xFF1E293B),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-      ),
+      // cardTheme: CardTheme(
+      //   color: const Color(0xFF1E293B),
+      //   shape: RoundedRectangleBorder(
+      //     borderRadius: BorderRadius.circular(16),
+      //   ),
+      // ),
     );
   }
 
@@ -64,12 +64,10 @@ class AppTheme {
           fontSize: 15,
         ),
       ),
-      cardTheme: CardTheme(
-        color: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-      ),
+      // cardTheme: CardTheme(
+      //   color: Colors.white,
+      //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      // ),
     );
   }
 }

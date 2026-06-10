@@ -8,48 +8,64 @@ generator client {
 }
 
 model User {
-  id          String    @id @default(uuid())
-  email       String    @unique
-  name        String?
-  role        Role      @default(CLIENT)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  hostedSlots Slot[]    @relation("HostSlots")
-  bookings    Booking[] @relation("ClientBookings")
+  id        String     @id @default(uuid())
+  name      String
+  email     String     @unique
+  bookings  Booking[]
+  waitlists Waitlist[]
+}
+
+model Venue {
+  id        String   @id @default(uuid())
+  name      String
+  sportType String
+  address   String
+  imageUrl  String?
+  slots     Slot[]
+
+  @@index([sportType])
+}
+
+enum SlotStatus {
+  AVAILABLE
+  BOOKED
 }
 
 model Slot {
-  id        String    @id @default(uuid())
-  hostId    String
-  host      User      @relation("HostSlots", fields: [hostId], references: [id], onDelete: Cascade)
+  id        String     @id @default(uuid())
+  venueId   String
+  venue     Venue      @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  date      DateTime   @db.Date
   startTime DateTime
   endTime   DateTime
-  isBooked  Boolean   @default(false)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  bookings  Booking[]
+  status    SlotStatus @default(AVAILABLE)
+  booking   Booking?
+  waitlists Waitlist[]
+
+  @@index([venueId, date])
+  @@index([date, startTime])
 }
 
 model Booking {
   id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  slotId    String   @unique
+  slot      Slot     @relation(fields: [slotId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Waitlist {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   slotId    String
   slot      Slot     @relation(fields: [slotId], references: [id], onDelete: Cascade)
-  clientId  String
-  client    User     @relation("ClientBookings", fields: [clientId], references: [id], onDelete: Cascade)
-  status    Status   @default(PENDING)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
-  @@unique([slotId, clientId])
-}
-
-enum Role {
-  HOST
-  CLIENT
-}
-
-enum Status {
-  PENDING
-  CONFIRMED
-  CANCELLED
+  @@unique([slotId, userId])
+  @@index([userId])
+  @@index([slotId, createdAt])
 }
