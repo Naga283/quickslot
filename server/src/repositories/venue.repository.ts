@@ -25,6 +25,32 @@ export class VenueRepository {
       orderBy: { name: 'asc' },
     });
   }
+
+  async findAndCountAll(params: {
+    sportType?: string;
+    skip?: number;
+    take?: number;
+  }): Promise<{ venues: Venue[]; total: number }> {
+    const where: Prisma.VenueWhereInput = {};
+    if (params.sportType) {
+      where.sportType = {
+        equals: params.sportType,
+        mode: 'insensitive',
+      };
+    }
+
+    const [venues, total] = await Promise.all([
+      prisma.venue.findMany({
+        where,
+        skip: params.skip,
+        take: params.take,
+        orderBy: { name: 'asc' },
+      }),
+      prisma.venue.count({ where }),
+    ]);
+
+    return { venues, total };
+  }
 }
 
 export const venueRepository = new VenueRepository();

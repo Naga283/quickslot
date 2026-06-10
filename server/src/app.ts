@@ -1,7 +1,9 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
+import swaggerUi from 'swagger-ui-express';
 import { errorHandler } from './core/middlewares/error.middleware';
 import apiRouter from './routes';
+import { swaggerSpec } from './config/swagger';
 
 const app: Application = express();
 
@@ -9,6 +11,9 @@ const app: Application = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Swagger Documentation route
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // API routes
 app.use('/api', apiRouter);

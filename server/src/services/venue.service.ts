@@ -18,6 +18,20 @@ export class VenueService {
   async getAllVenues(filters?: { sportType?: string }): Promise<Venue[]> {
     return venueRepository.findAll(filters);
   }
+
+  async getPaginatedVenues(params: {
+    sportType?: string;
+    page: number;
+    limit: number;
+  }): Promise<{ venues: Venue[]; total: number }> {
+    const skip = (params.page - 1) * params.limit;
+    const take = params.limit;
+    return venueRepository.findAndCountAll({
+      sportType: params.sportType,
+      skip,
+      take,
+    });
+  }
 }
 
 export const venueService = new VenueService();
