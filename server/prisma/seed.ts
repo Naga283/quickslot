@@ -70,19 +70,18 @@ async function main() {
   const today = new Date();
 
   for (let dayOffset = 0; dayOffset < 30; dayOffset++) {
-    const currentDate = new Date(today);
-    currentDate.setDate(today.getDate() + dayOffset);
-    currentDate.setHours(0, 0, 0, 0);
+    // Construct local date but represent it correctly in UTC to avoid local timezone offset shifting the date
+    const currentDate = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate() + dayOffset));
 
     for (const venue of venues) {
       // 6 AM to 10 PM (22:00)
       // 1-hour slots: 6-7, 7-8, ..., 21-22 (last slot starts at 9 PM / 21:00)
       for (let hour = 6; hour < 22; hour++) {
         const startTime = new Date(currentDate);
-        startTime.setHours(hour, 0, 0, 0);
+        startTime.setUTCHours(hour, 0, 0, 0);
 
         const endTime = new Date(currentDate);
-        endTime.setHours(hour + 1, 0, 0, 0);
+        endTime.setUTCHours(hour + 1, 0, 0, 0);
 
         slotsToCreate.push({
           venueId: venue.id,

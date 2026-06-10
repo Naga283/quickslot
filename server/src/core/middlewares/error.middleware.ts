@@ -1,24 +1,28 @@
 import { Request, Response, NextFunction } from 'express';
-
-export interface CustomError extends Error {
-  statusCode?: number;
-}
+import { ApiError } from '../../utils/api-error';
+import { errorResponse } from '../../utils/response';
+import { logger } from '../../utils/logger';
 
 export const errorHandler = (
-  err: CustomError,
+  err: any,
   req: Request,
   res: Response,
   _next: NextFunction,
-) => {
-  const statusCode = err.statusCode || 500;
-  const message = err.message || 'Internal Server Error';
+): void => {
+  let statusCode = 500;
+  let message = 'Internal Server Error';
+  let errors: any = undefined;
 
-  console.error(`[Error] ${statusCode} - ${message}\nStack: ${err.stack}`);
+  if (err instanceof ApiError) {
+    statusCode = err.statusCode;
+    message = err.message;
+    errors = err.errors;
+  } else if (err instanceof Error) {
+    message = err.message;
+  }
 
-  res.status(statusCode).json({
-    status: 'error',
-    statusCode,
-    message,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
-  });
+  // Log error using custom logger
+  logger.error(`${req.method} ${req.originalUrl} - Status: ${statusCode} - Message: ${message}`, err);
+
+  errorResponse(res, message, statusCode, errors, err.stack);
 };
