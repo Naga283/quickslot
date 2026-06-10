@@ -1,0 +1,47 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# VS Code related
+.vscode/
+
+# Flutter/Dart/Pub related (for app/)
+**/doc/api/
+**/ios/Flutter/.last_build_id
+app/.dart_tool/
+app/.flutter-plugins-dependencies
+app/.pub-cache/
+app/.pub/
+app/build/
+app/coverage/
+
+# Android Studio will place build artifacts here
+app/android/app/debug
+app/android/app/profile
+app/android/app/release
+
+# Node.js / Express (for server/)
+server/node_modules/
+server/dist/
+server/.env
+server/npm-debug.log*
+server/yarn-debug.log*
+server/yarn-error.log*
+
+# Prisma generated assets (usually we check in schema.prisma, but ignore migrations if needed or keep migrations. We want to keep migrations, so do not ignore migrations.)

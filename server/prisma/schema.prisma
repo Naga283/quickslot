@@ -1,0 +1,55 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id          String    @id @default(uuid())
+  email       String    @unique
+  name        String?
+  role        Role      @default(CLIENT)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  hostedSlots Slot[]    @relation("HostSlots")
+  bookings    Booking[] @relation("ClientBookings")
+}
+
+model Slot {
+  id        String    @id @default(uuid())
+  hostId    String
+  host      User      @relation("HostSlots", fields: [hostId], references: [id], onDelete: Cascade)
+  startTime DateTime
+  endTime   DateTime
+  isBooked  Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  bookings  Booking[]
+}
+
+model Booking {
+  id        String   @id @default(uuid())
+  slotId    String
+  slot      Slot     @relation(fields: [slotId], references: [id], onDelete: Cascade)
+  clientId  String
+  client    User     @relation("ClientBookings", fields: [clientId], references: [id], onDelete: Cascade)
+  status    Status   @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([slotId, clientId])
+}
+
+enum Role {
+  HOST
+  CLIENT
+}
+
+enum Status {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
