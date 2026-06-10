@@ -1,10 +1,11 @@
 import prisma from '../config/db';
-import { bookingRepository } from '../repositories/booking.repository';
+import { bookingRepository, BookingWithRelations } from '../repositories/booking.repository';
 import { slotRepository } from '../repositories/slot.repository';
 import { userRepository } from '../repositories/user.repository';
 import { waitlistRepository } from '../repositories/waitlist.repository';
 import { ApiError } from '../utils/api-error';
 import { Booking, SlotStatus, Slot } from '@prisma/client';
+import { emitSlotUpdated, emitBookingCreated, emitBookingCancelled } from '../utils/socket';
 
 export class BookingService {
   async createBooking(userId: string, slotId: string): Promise<Booking> {
@@ -13,7 +14,6 @@ export class BookingService {
       throw ApiError.notFound('User not found');
     }
 
-    // Pre-check before entering transaction/lock (optional but good for performance)
     const slot = await slotRepository.findById(slotId);
     if (!slot) {
       throw ApiError.notFound('Slot not found');
@@ -23,9 +23,8 @@ export class BookingService {
     }
 
     try {
-      return await prisma.$transaction(async (tx) => {
+      const booking = await prisma.$transaction(async (tx) => {
         // Acquire row-level lock on the Slot row using SELECT ... FOR UPDATE
-        // This blocks any other concurrent select for update requests on this slot
         const slots = await tx.$queryRaw<Slot[]>`
           SELECT * FROM "Slot" WHERE id = ${slotId} FOR UPDATE
         `;
@@ -42,7 +41,7 @@ export class BookingService {
         }
 
         // Create the booking
-        const booking = await bookingRepository.create({ userId, slotId }, tx);
+        const newBooking = await bookingRepository.create({ userId, slotId }, tx);
         
         // Update slot status to BOOKED
         await tx.slot.update({
@@ -60,10 +59,15 @@ export class BookingService {
           });
         }
 
-        return booking;
+        return newBooking;
       });
+
+      // Broadcast booking details and slot state updates to clients instantly
+      emitSlotUpdated(slotId, SlotStatus.BOOKED, slot.venueId);
+      emitBookingCreated(booking);
+
+      return booking;
     } catch (error: any) {
-      // Prisma error code P2002: Unique constraint failed (e.g. slotId unique constraint on Booking table)
       if (error.code === 'P2002') {
         throw ApiError.conflict('Slot is already booked');
       }
@@ -71,15 +75,16 @@ export class BookingService {
     }
   }
 
-  async cancelBooking(bookingId: string): Promise<{ booking: Booking; promotedWaitlist: boolean }> {
+  async cancelBooking(bookingId: string): Promise<{ booking: BookingWithRelations; promotedWaitlist: boolean }> {
     const booking = await bookingRepository.findById(bookingId);
     if (!booking) {
       throw ApiError.notFound('Booking not found');
     }
 
     const slotId = booking.slotId;
+    const venueId = booking.slot.venueId;
 
-    return prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       await bookingRepository.delete(bookingId, tx);
 
       const nextInLine = await waitlistRepository.findFirstForSlot(slotId, tx);
@@ -101,9 +106,20 @@ export class BookingService {
         return { booking, promotedWaitlist: false };
       }
     });
+
+    // Broadcast booking cancellation and slot status updates to clients instantly
+    emitBookingCancelled(bookingId, slotId);
+    
+    if (result.promotedWaitlist) {
+      emitSlotUpdated(slotId, SlotStatus.BOOKED, venueId);
+    } else {
+      emitSlotUpdated(slotId, SlotStatus.AVAILABLE, venueId);
+    }
+
+    return result;
   }
 
-  async getBookingById(id: string): Promise<Booking> {
+  async getBookingById(id: string): Promise<BookingWithRelations> {
     const booking = await bookingRepository.findById(id);
     if (!booking) {
       throw ApiError.notFound('Booking not found');

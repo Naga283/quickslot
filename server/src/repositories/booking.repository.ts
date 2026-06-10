@@ -1,13 +1,22 @@
 import prisma from '../config/db';
 import { Booking, Prisma } from '@prisma/client';
 
+export type BookingWithRelations = Prisma.BookingGetPayload<{
+  include: {
+    user: true;
+    slot: {
+      include: { venue: true };
+    };
+  };
+}>;
+
 export class BookingRepository {
   async create(data: Prisma.BookingUncheckedCreateInput, tx?: Prisma.TransactionClient): Promise<Booking> {
     const client = tx || prisma;
     return client.booking.create({ data });
   }
 
-  async findById(id: string): Promise<Booking | null> {
+  async findById(id: string): Promise<BookingWithRelations | null> {
     return prisma.booking.findUnique({
       where: { id },
       include: {
