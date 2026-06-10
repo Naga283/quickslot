@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'venue.dart';
 
 part 'slot.freezed.dart';
 part 'slot.g.dart';
@@ -19,6 +20,7 @@ class Slot with _$Slot {
     required DateTime startTime,
     required DateTime endTime,
     required SlotStatus status,
+    Venue? venue,
   }) = _Slot;
 
   factory Slot.fromJson(Map<String, dynamic> json) => _$SlotFromJson(json);

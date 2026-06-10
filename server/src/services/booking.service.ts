@@ -5,7 +5,7 @@ import { userRepository } from '../repositories/user.repository';
 import { waitlistRepository } from '../repositories/waitlist.repository';
 import { ApiError } from '../utils/api-error';
 import { Booking, SlotStatus, Slot } from '@prisma/client';
-import { emitSlotUpdated, emitBookingCreated, emitBookingCancelled } from '../utils/socket';
+import { emitSlotUpdated, emitBookingCreated, emitBookingCancelled, emitWaitlistPromoted } from '../utils/socket';
 
 export class BookingService {
   async createBooking(userId: string, slotId: string): Promise<Booking> {
@@ -90,14 +90,14 @@ export class BookingService {
       const nextInLine = await waitlistRepository.findFirstForSlot(slotId, tx);
 
       if (nextInLine) {
-        await bookingRepository.create({
+        const newBooking = await bookingRepository.create({
           userId: nextInLine.userId,
           slotId: slotId,
         }, tx);
 
         await waitlistRepository.delete(nextInLine.id, tx);
 
-        return { booking, promotedWaitlist: true };
+        return { booking, promotedWaitlist: true, newBooking };
       } else {
         await tx.slot.update({
           where: { id: slotId },
@@ -110,8 +110,10 @@ export class BookingService {
     // Broadcast booking cancellation and slot status updates to clients instantly
     emitBookingCancelled(bookingId, slotId);
     
-    if (result.promotedWaitlist) {
+    if (result.promotedWaitlist && result.newBooking) {
       emitSlotUpdated(slotId, SlotStatus.BOOKED, venueId);
+      emitBookingCreated(result.newBooking);
+      emitWaitlistPromoted(result.newBooking.userId, slotId, result.newBooking);
     } else {
       emitSlotUpdated(slotId, SlotStatus.AVAILABLE, venueId);
     }

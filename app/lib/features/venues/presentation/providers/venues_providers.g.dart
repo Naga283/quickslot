@@ -354,5 +354,133 @@ class _FetchVenueSlotsProviderElement
   @override
   String? get date => (origin as FetchVenueSlotsProvider).date;
 }
+
+String _$fetchVenueByIdHash() => r'f377fbdd4e0b98f61c43367e987b1693bedd1753';
+
+/// See also [fetchVenueById].
+@ProviderFor(fetchVenueById)
+const fetchVenueByIdProvider = FetchVenueByIdFamily();
+
+/// See also [fetchVenueById].
+class FetchVenueByIdFamily extends Family<AsyncValue<Venue>> {
+  /// See also [fetchVenueById].
+  const FetchVenueByIdFamily();
+
+  /// See also [fetchVenueById].
+  FetchVenueByIdProvider call(
+    String id,
+  ) {
+    return FetchVenueByIdProvider(
+      id,
+    );
+  }
+
+  @override
+  FetchVenueByIdProvider getProviderOverride(
+    covariant FetchVenueByIdProvider provider,
+  ) {
+    return call(
+      provider.id,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'fetchVenueByIdProvider';
+}
+
+/// See also [fetchVenueById].
+class FetchVenueByIdProvider extends AutoDisposeFutureProvider<Venue> {
+  /// See also [fetchVenueById].
+  FetchVenueByIdProvider(
+    String id,
+  ) : this._internal(
+          (ref) => fetchVenueById(
+            ref as FetchVenueByIdRef,
+            id,
+          ),
+          from: fetchVenueByIdProvider,
+          name: r'fetchVenueByIdProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$fetchVenueByIdHash,
+          dependencies: FetchVenueByIdFamily._dependencies,
+          allTransitiveDependencies:
+              FetchVenueByIdFamily._allTransitiveDependencies,
+          id: id,
+        );
+
+  FetchVenueByIdProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.id,
+  }) : super.internal();
+
+  final String id;
+
+  @override
+  Override overrideWith(
+    FutureOr<Venue> Function(FetchVenueByIdRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: FetchVenueByIdProvider._internal(
+        (ref) => create(ref as FetchVenueByIdRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        id: id,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<Venue> createElement() {
+    return _FetchVenueByIdProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is FetchVenueByIdProvider && other.id == id;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, id.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin FetchVenueByIdRef on AutoDisposeFutureProviderRef<Venue> {
+  /// The parameter `id` of this provider.
+  String get id;
+}
+
+class _FetchVenueByIdProviderElement
+    extends AutoDisposeFutureProviderElement<Venue> with FetchVenueByIdRef {
+  _FetchVenueByIdProviderElement(super.provider);
+
+  @override
+  String get id => (origin as FetchVenueByIdProvider).id;
+}
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

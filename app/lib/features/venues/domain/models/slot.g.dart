@@ -13,6 +13,9 @@ _$SlotImpl _$$SlotImplFromJson(Map<String, dynamic> json) => _$SlotImpl(
       startTime: DateTime.parse(json['startTime'] as String),
       endTime: DateTime.parse(json['endTime'] as String),
       status: $enumDecode(_$SlotStatusEnumMap, json['status']),
+      venue: json['venue'] == null
+          ? null
+          : Venue.fromJson(json['venue'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$SlotImplToJson(_$SlotImpl instance) =>
@@ -23,6 +26,7 @@ Map<String, dynamic> _$$SlotImplToJson(_$SlotImpl instance) =>
       'startTime': instance.startTime.toIso8601String(),
       'endTime': instance.endTime.toIso8601String(),
       'status': _$SlotStatusEnumMap[instance.status]!,
+      'venue': instance.venue,
     };
 
 const _$SlotStatusEnumMap = {

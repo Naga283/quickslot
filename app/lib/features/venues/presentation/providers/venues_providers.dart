@@ -38,3 +38,8 @@ Future<List<Slot>> fetchVenueSlots(
         date: date,
       );
 }
+
+@riverpod
+Future<Venue> fetchVenueById(FetchVenueByIdRef ref, String id) {
+  return ref.watch(venuesRepositoryProvider).getVenueById(id);
+}

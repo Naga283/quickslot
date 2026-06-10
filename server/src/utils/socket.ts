@@ -50,3 +50,10 @@ export const emitBookingCancelled = (bookingId: string, slotId: string): void =>
     io.emit('booking_cancelled', { bookingId, slotId });
   }
 };
+
+export const emitWaitlistPromoted = (userId: string, slotId: string, booking: any): void => {
+  if (io) {
+    logger.info(`[Socket] Emitting waitlist_promoted event - User ID: ${userId}, Slot ID: ${slotId}`);
+    io.emit('waitlist_promoted', { userId, slotId, booking });
+  }
+};

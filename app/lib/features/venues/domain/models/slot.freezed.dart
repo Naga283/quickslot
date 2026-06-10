@@ -26,6 +26,7 @@ mixin _$Slot {
   DateTime get startTime => throw _privateConstructorUsedError;
   DateTime get endTime => throw _privateConstructorUsedError;
   SlotStatus get status => throw _privateConstructorUsedError;
+  Venue? get venue => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -43,7 +44,10 @@ abstract class $SlotCopyWith<$Res> {
       DateTime date,
       DateTime startTime,
       DateTime endTime,
-      SlotStatus status});
+      SlotStatus status,
+      Venue? venue});
+
+  $VenueCopyWith<$Res>? get venue;
 }
 
 /// @nodoc
@@ -65,6 +69,7 @@ class _$SlotCopyWithImpl<$Res, $Val extends Slot>
     Object? startTime = null,
     Object? endTime = null,
     Object? status = null,
+    Object? venue = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -91,7 +96,23 @@ class _$SlotCopyWithImpl<$Res, $Val extends Slot>
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
               as SlotStatus,
+      venue: freezed == venue
+          ? _value.venue
+          : venue // ignore: cast_nullable_to_non_nullable
+              as Venue?,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $VenueCopyWith<$Res>? get venue {
+    if (_value.venue == null) {
+      return null;
+    }
+
+    return $VenueCopyWith<$Res>(_value.venue!, (value) {
+      return _then(_value.copyWith(venue: value) as $Val);
+    });
   }
 }
 
@@ -108,7 +129,11 @@ abstract class _$$SlotImplCopyWith<$Res> implements $SlotCopyWith<$Res> {
       DateTime date,
       DateTime startTime,
       DateTime endTime,
-      SlotStatus status});
+      SlotStatus status,
+      Venue? venue});
+
+  @override
+  $VenueCopyWith<$Res>? get venue;
 }
 
 /// @nodoc
@@ -127,6 +152,7 @@ class __$$SlotImplCopyWithImpl<$Res>
     Object? startTime = null,
     Object? endTime = null,
     Object? status = null,
+    Object? venue = freezed,
   }) {
     return _then(_$SlotImpl(
       id: null == id
@@ -153,6 +179,10 @@ class __$$SlotImplCopyWithImpl<$Res>
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
               as SlotStatus,
+      venue: freezed == venue
+          ? _value.venue
+          : venue // ignore: cast_nullable_to_non_nullable
+              as Venue?,
     ));
   }
 }
@@ -166,7 +196,8 @@ class _$SlotImpl implements _Slot {
       required this.date,
       required this.startTime,
       required this.endTime,
-      required this.status});
+      required this.status,
+      this.venue});
 
   factory _$SlotImpl.fromJson(Map<String, dynamic> json) =>
       _$$SlotImplFromJson(json);
@@ -183,10 +214,12 @@ class _$SlotImpl implements _Slot {
   final DateTime endTime;
   @override
   final SlotStatus status;
+  @override
+  final Venue? venue;
 
   @override
   String toString() {
-    return 'Slot(id: $id, venueId: $venueId, date: $date, startTime: $startTime, endTime: $endTime, status: $status)';
+    return 'Slot(id: $id, venueId: $venueId, date: $date, startTime: $startTime, endTime: $endTime, status: $status, venue: $venue)';
   }
 
   @override
@@ -200,13 +233,14 @@ class _$SlotImpl implements _Slot {
             (identical(other.startTime, startTime) ||
                 other.startTime == startTime) &&
             (identical(other.endTime, endTime) || other.endTime == endTime) &&
-            (identical(other.status, status) || other.status == status));
+            (identical(other.status, status) || other.status == status) &&
+            (identical(other.venue, venue) || other.venue == venue));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, venueId, date, startTime, endTime, status);
+  int get hashCode => Object.hash(
+      runtimeType, id, venueId, date, startTime, endTime, status, venue);
 
   @JsonKey(ignore: true)
   @override
@@ -229,7 +263,8 @@ abstract class _Slot implements Slot {
       required final DateTime date,
       required final DateTime startTime,
       required final DateTime endTime,
-      required final SlotStatus status}) = _$SlotImpl;
+      required final SlotStatus status,
+      final Venue? venue}) = _$SlotImpl;
 
   factory _Slot.fromJson(Map<String, dynamic> json) = _$SlotImpl.fromJson;
 
@@ -245,6 +280,8 @@ abstract class _Slot implements Slot {
   DateTime get endTime;
   @override
   SlotStatus get status;
+  @override
+  Venue? get venue;
   @override
   @JsonKey(ignore: true)
   _$$SlotImplCopyWith<_$SlotImpl> get copyWith =>

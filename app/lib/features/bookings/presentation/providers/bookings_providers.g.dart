@@ -173,5 +173,21 @@ class _FetchUserBookingsProviderElement
   @override
   String get userId => (origin as FetchUserBookingsProvider).userId;
 }
+
+String _$myBookingsHash() => r'a88a71b4fbf6062350df5e27a39b5dbfed079d60';
+
+/// See also [MyBookings].
+@ProviderFor(MyBookings)
+final myBookingsProvider =
+    AutoDisposeNotifierProvider<MyBookings, MyBookingsState>.internal(
+  MyBookings.new,
+  name: r'myBookingsProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$myBookingsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$MyBookings = AutoDisposeNotifier<MyBookingsState>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
